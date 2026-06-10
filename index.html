@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Dileep Kumar | BCA Cloud Tech · Full Stack Developer</title>
+    <meta name="description" content="Dileep Kumar — BCA student specializing in Cloud Technology, Full Stack Development Intern at Zephyr Technologies. Passionate about building practical software solutions." />
+    <meta name="author" content="Dileep Kumar" />
+    <!-- Tailwind + Google Fonts + FontAwesome CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Framer Motion UMD + React / ReactDOM -->
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      * { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+      body { background-color: #F8FAFC; margin: 0; }
+      ::-webkit-scrollbar { width: 8px; }
+      ::-webkit-scrollbar-track { background: #e2e8f0; }
+      ::-webkit-scrollbar-thumb { background: #2563EB; border-radius: 10px; }
+      /* Smooth transitions */
+      .transition-all { transition-property: all; }
+      .hover-scale:hover { transform: scale(1.02); }
+    </style>
+  </head>
+  <body class="antialiased">
+    <div id="root"></div>
+
+    <script type="text/babel" data-presets="react">
+      // --------------------------------------------------------------
+      // Framer Motion Safe wrapper (robust fallback for CDN issues)
+      // --------------------------------------------------------------
+      const MotionSafe = (() => {
+        let motionLib = null;
+        let presenceLib = null;
+        try {
+          if (typeof window !== 'undefined') {
+            if (window.FramerMotion) motionLib = window.FramerMotion;
+            else if (window['framer-motion']) motionLib = window['framer-motion'];
+            else if (window.motion) motionLib = window;
+          }
+          if (motionLib && motionLib.motion) {
+            return { motion: motionLib.motion, AnimatePresence: motionLib.AnimatePresence || (() => null) };
+          }
+        } catch(e) { console.warn(e); }
+        // Fallback: create dummy motion components that render regular elements
+        const createFallbackMotion = (Component) => {
+          return (props) => {
+            const { children, whileInView, initial, animate, transition, viewport, whileHover, ...rest } = props;
+            return React.createElement(Component || 'div', rest, children);
+          };
+        };
+        const dummyMotion = {
+          div: createFallbackMotion('div'),
+          nav: createFallbackMotion('nav'),
+          section: createFallbackMotion('section'),
+          form: createFallbackMotion('form'),
+          button: createFallbackMotion('button')
+        };
+        return { motion: dummyMotion, AnimatePresence: () => null };
+      })();
+      const { motion, AnimatePresence } = MotionSafe;
+
+      // --------------------------------------------------------------
+      // Data Models (enhanced with real content & correct icons)
+      // --------------------------------------------------------------
+      const projectsData = [
+        { title: "Cloud Task Manager", desc: "Full-stack task manager with Azure Functions and React. Deployed using Azure Static Web Apps.", tags: ["React", "Azure", "Node.js", "Tailwind"], icon: "fa-cloud-arrow-up" },
+        { title: "Portfolio 3.0", desc: "Modern developer portfolio with smooth animations, contact form, and responsive layout.", tags: ["React", "Framer Motion", "Tailwind", "EmailJS"], icon: "fa-laptop-code" },
+        { title: "E-Commerce Dashboard", desc: "Analytics dashboard for product insights using Chart.js, Python Flask backend mock.", tags: ["Python", "Flask", "Chart.js", "CSS"], icon: "fa-chart-line" },
+        { title: "WeatherWise App", desc: "Real-time weather web app using OpenWeather API and geolocation.", tags: ["JavaScript", "API", "HTML/CSS", "Responsive"], icon: "fa-sun" }
+      ];
+
+      const experienceList = [
+        { role: "Full Stack Development Intern", company: "Zephyr Technologies", period: "Current", duties: ["Full-stack web development projects", "Collaborate on real-world applications", "Agile practices, testing & deployment"] },
+        { role: "Python Programming Intern", company: "System Tron", period: "Recent internship", duties: ["4-week intensive Python internship", "Built foundational scripts and problem-solving tasks"] },
+        { role: "Cloud Technology Intern", company: "Intellipaat", period: "Certification program", duties: ["Azure Cloud Technology certification training", "Hands-on labs on cloud services and deployment"] },
+        { role: "Front-End Development Intern", company: "Great Learning / FreeCodeCamp", period: "Training phase", duties: ["HTML/CSS fundamentals, responsive web pages", "Modern layouts and accessibility best practices"] }
+      ];
+
+      const certifications = [
+        { name: "Python Programming Certification", issuer: "System Tron", icon: "fab fa-python" },
+        { name: "Cloud Technology Certification (Azure)", issuer: "Intellipaat", icon: "fab fa-microsoft" },
+        { name: "Front-End Development (HTML)", issuer: "Great Learning", icon: "fas fa-code" },
+        { name: "Design Thinking Certification", issuer: "Great Learning", icon: "fas fa-lightbulb" },
+        { name: "Employability Skills Certification", issuer: "Great Learning", icon: "fas fa-briefcase" }
+      ];
+
+      const skills = {
+        languages: ["Python", "Java", "C Programming", "JavaScript"],
+        web: ["HTML", "CSS", "React", "Tailwind CSS"],
+        cloud: ["Cloud Computing", "Microsoft Azure", "Azure Functions", "Static Web Apps"]
+      };
+
+      const funFacts = [
+        "I love turning cloud ideas into polished web experiences that feel intuitive and fast.",
+        "Building interfaces that users enjoy is my favorite part of every project.",
+        "I add motion and thoughtful interactions to make digital products feel alive.",
+        "I enjoy solving complex problems with elegant code and clear design." 
+      ];
+
+      // --------------------------------------------------------------
+      // Functional Components
+      // --------------------------------------------------------------
+      const NavBar = ({ isDarkMode, onToggleTheme }) => {
+        const navItems = ["Home", "About", "Skills", "Experience", "Certifications", "Projects", "Resume", "Contact"];
+        return (
+          <motion.nav 
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
+            className={`fixed top-0 left-0 w-full backdrop-blur-md shadow-md z-50 border-b ${isDarkMode ? 'bg-slate-900/95 border-slate-700' : 'bg-white/95 border-gray-200'}`}
+          >
+            <div className="max-w-7xl mx-auto px-6 md:px-10 py-3 flex flex-wrap justify-between items-center">
+              <div className="text-2xl font-extrabold tracking-tight">
+                <span className={`text-[#2563EB] ${isDarkMode ? 'text-sky-300' : ''}`}>Dileep</span><span className={`${isDarkMode ? 'text-slate-100' : 'text-[#0F172A]'}`}>.dev</span>
+              </div>
+              <div className={`hidden md:flex space-x-6 font-medium ${isDarkMode ? 'text-slate-200' : 'text-[#1E293B]'}`}>
+                {navItems.map(item => (
+                  <a key={item} href={`#${item.toLowerCase()}`} className={`transition-all duration-200 text-sm lg:text-base font-semibold hover:scale-105 ${isDarkMode ? 'hover:text-sky-300' : 'hover:text-[#2563EB]'}`}>{item}</a>
+                ))}
+              </div>
+              <div className="flex gap-3 items-center">
+                <button type="button" onClick={onToggleTheme} className={`inline-flex items-center justify-center w-10 h-10 rounded-full border transition ${isDarkMode ? 'border-slate-600 bg-slate-800 text-slate-100 hover:border-slate-400' : 'border-gray-300 bg-white text-slate-900 hover:border-gray-500'}`} aria-label="Toggle theme">
+                  <i className={`fas ${isDarkMode ? 'fa-sun' : 'fa-moon'}`}></i>
+                </button>
+                <a href="https://www.linkedin.com/in/dileep-kumar-ha/" target="_blank" rel="noopener noreferrer" className={`${isDarkMode ? 'text-slate-200' : 'text-[#2563EB]'} hover:scale-110 transition-all duration-200`}><i className="fab fa-linkedin text-xl"></i></a>
+                <a href="https://github.com/dileepkumar" target="_blank" rel="noopener noreferrer" className={`${isDarkMode ? 'text-slate-200' : 'text-[#0F172A]'} hover:scale-110 transition-all`}><i className="fab fa-github text-xl"></i></a>
+              </div>
+            </div>
+          </motion.nav>
+        )
+      };
+
+      const Hero = ({ funFact, onRevealFact, onPickProject, isProfileVisible, onToggleProfile }) => (
+        <section id="home" className="relative min-h-screen flex items-center pt-24 pb-16 overflow-hidden bg-gradient-to-br from-[#F8FAFF] via-[#E8F1FF] to-[#EFF6FF]">
+          <div className="pointer-events-none absolute -right-20 top-24 h-72 w-72 rounded-full bg-[#2563EB]/10 blur-3xl" />
+          <div className="pointer-events-none absolute left-10 top-10 h-40 w-40 rounded-full bg-[#F59E0B]/15 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-24 right-1/4 h-96 w-96 rounded-full bg-[#14B8A6]/10 blur-3xl" />
+          <div className="max-w-7xl mx-auto px-6 md:px-10 grid md:grid-cols-2 gap-12 items-center">
+            <motion.div initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }} className="relative z-10">
+              <span className="inline-flex items-center gap-2 text-[#2563EB] font-bold text-sm uppercase tracking-wider bg-slate-100 px-3 py-2 rounded-full shadow-sm border border-[#DBEAFE]"><i className="fas fa-bolt"></i> BCA Student · Cloud Tech Builder</span>
+              <h1 className="text-4xl md:text-6xl font-extrabold mt-6 text-[#0F172A] leading-tight tracking-tight">Hi, I'm Dileep Kumar</h1>
+              <p className="text-xl text-[#1E293B]/80 mt-6 border-l-4 border-[#2563EB] pl-5 font-semibold">I build polished apps with cloud logic, fast UX, and modern interfaces that stand out.</p>
+              <p className="text-[#334155] mt-6 leading-relaxed max-w-xl">I combine clean code, thoughtful design, and cloud technologies to craft web experiences that feel intuitive and professional. My work is focused on performance, accessibility, and results that users love.</p>
+              <div className="mt-10 flex flex-wrap gap-4">
+                <a href="#contact" className="bg-[#2563EB] text-white px-6 py-4 rounded-2xl font-semibold hover:bg-[#1e4bc2] transition shadow-xl flex items-center gap-3"><i className="fas fa-paper-plane"></i> Let’s Build Together</a>
+                <a href="#projects" className="border-2 border-[#2563EB] text-[#2563EB] px-6 py-4 rounded-2xl font-semibold hover:bg-[#2563EB]/10 transition flex items-center gap-3"><i className="fas fa-rocket"></i> See My Work</a>
+              </div>
+              <div className="mt-10 grid gap-4 sm:grid-cols-3">
+                {['Cloud-first', 'Fast UI', 'Clean code'].map((item, idx) => (
+                  <div key={idx} className="rounded-3xl bg-white/90 border border-gray-200 p-4 shadow-sm hover:shadow-md transition">
+                    <p className="text-sm uppercase tracking-[0.24em] text-[#2563EB] font-bold">{item}</p>
+                    <p className="mt-3 text-[#475569] text-sm">{item === 'Cloud-first' ? 'Azure powered apps and deployment-ready solutions.' : item === 'Fast UI' ? 'Smooth experience with modern responsiveness.' : 'Readable, maintainable code that scales.'}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-10 p-6 rounded-[2rem] bg-white border border-gray-200 shadow-xl">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-sm uppercase tracking-[0.3em] text-[#2563EB] font-semibold">Interactive Profile</p>
+                    <h3 className="mt-3 text-2xl font-bold text-[#0F172A]">Tap the circle to unlock my details</h3>
+                  </div>
+                  <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#2563EB]/10 text-[#2563EB] shadow-sm"><i className="fas fa-hand-pointer"></i></div>
+                </div>
+                <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                  <button onClick={onRevealFact} className="w-full bg-[#2563EB] text-white px-4 py-3 rounded-2xl font-semibold hover:bg-[#1e4bc2] transition">Reveal a fun fact</button>
+                  <button onClick={onPickProject} className="w-full border border-[#2563EB] text-[#2563EB] px-4 py-3 rounded-2xl font-semibold hover:bg-[#2563EB]/10 transition">Pick a project</button>
+                </div>
+                <div className="mt-5 rounded-3xl bg-slate-50 p-4 border border-slate-200 text-[#0F172A]">{funFact}</div>
+              </div>
+            </motion.div>
+            <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5 }} className="relative z-10 flex flex-col items-center gap-4">
+              <div onClick={onToggleProfile} className={`relative cursor-pointer rounded-full p-3 w-80 h-80 flex items-center justify-center shadow-[0_20px_80px_rgba(37,99,235,0.15)] transition-all duration-300 ${isProfileVisible ? 'bg-red-500 ring-8 ring-red-300' : 'bg-gradient-to-br from-[#2563EB]/30 to-[#38BDF8]/40'} hover:scale-[1.03]`}>
+                <div className={`bg-white rounded-full w-72 h-72 flex items-center justify-center shadow-2xl border-4 ${isProfileVisible ? 'border-red-500' : 'border-white'}`}>
+                  <i className={`fas fa-user ${isProfileVisible ? 'text-red-500' : 'text-[#2563EB]'} text-8xl`}></i>
+                </div>
+                <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-white px-5 py-2 text-sm font-semibold text-[#2563EB] shadow-lg border border-slate-200">Click to reveal</div>
+              </div>
+              {isProfileVisible && (
+                <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md p-6 rounded-[2rem] bg-white border border-red-100 shadow-2xl">
+                  <div className="flex items-center gap-4">
+                    <div className="h-16 w-16 rounded-full bg-[#2563EB]/10 flex items-center justify-center text-[#2563EB] text-2xl font-bold">DK</div>
+                    <div>
+                      <p className="text-sm uppercase tracking-[0.24em] text-[#EF4444] font-bold">Profile Active</p>
+                      <h3 className="text-2xl font-bold text-[#0F172A]">Dileep Kumar</h3>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-[#334155]">Full Stack Developer focused on beautiful cloud-powered web experiences. I enjoy building interfaces that feel fast, clear, and delightful.</p>
+                  <div className="mt-6 grid gap-3">
+                    <div className="rounded-3xl bg-[#FEF3F2] border border-red-100 p-4">
+                      <p className="text-sm text-[#B91C1C] font-semibold">Email</p>
+                      <p className="mt-2 text-[#0F172A]">dk8404714@gmail.com</p>
+                    </div>
+                    <div className="rounded-3xl bg-[#EFF6FF] border border-sky-100 p-4">
+                      <p className="text-sm text-[#0C4A6E] font-semibold">LinkedIn</p>
+                      <a href="https://www.linkedin.com/in/dileep-kumar-ha/" target="_blank" rel="noopener noreferrer" className="mt-2 block text-[#2563EB] hover:underline">linkedin.com/in/dileep-kumar-ha</a>
+                    </div>
+                    <div className="rounded-3xl bg-[#F8FAFC] border border-slate-200 p-4">
+                      <p className="text-sm text-[#0F172A] font-semibold">Top Skills</p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {['React','Python','Azure','Tailwind','APIs'].map(tag => <span key={tag} className="rounded-full bg-[#E0F2FE] px-3 py-1 text-sm text-[#0369A1]">{tag}</span>)}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
+          </div>
+        </section>
+      );
+
+      const About = () => (
+        <section id="about" className="py-20 bg-white scroll-mt-16">
+          <div className="max-w-7xl mx-auto px-6 md:px-10">
+            <motion.div whileInView={{ y: 0, opacity: 1 }} initial={{ y: 30, opacity: 0 }} viewport={{ once: true, margin: "-50px" }} transition={{ duration: 0.5 }}>
+              <h2 className="text-3xl font-bold text-[#0F172A] inline-block border-b-4 border-[#2563EB] pb-2">About Me</h2>
+            </motion.div>
+            <div className="grid md:grid-cols-2 gap-12 mt-10">
+              <motion.div whileInView={{ opacity: 1, x: 0 }} initial={{ opacity: 0, x: -20 }} viewport={{ once: true }}>
+                <p className="text-[#1E293B] leading-relaxed">I'm Dileep, a BCA student and creative cloud engineer who loves building polished, user-first web apps. I blend thoughtful design, clean code and cloud tools to create fast experiences that feel modern, intuitive and fun to use.</p>
+                <p className="mt-4 text-[#1E293B]">As a Full Stack Intern at Zephyr, I ship features, solve frontend/back-end challenges, and help teams deliver products that make users happy. I enjoy working with Azure, React, Python and bringing ideas to life with impact.</p>
+                <div className="mt-6 flex gap-6">
+                  <div><i className="fas fa-graduation-cap text-[#2563EB] text-2xl"></i><p className="font-semibold mt-1">BCA Cloud Tech</p><p className="text-sm">Ongoing degree program</p></div>
+                  <div><i className="fas fa-cloud text-[#38BDF8] text-2xl"></i><p className="font-semibold mt-1">Azure Certified</p><p className="text-sm">Intellipaat</p></div>
+                </div>
+              </motion.div>
+              <motion.div whileInView={{ opacity: 1, scale: 1 }} initial={{ scale: 0.96 }} viewport={{ once: true }} className="bg-[#F1F5F9] rounded-2xl p-6 shadow-sm">
+                <h3 className="text-xl font-bold flex items-center gap-2"><i className="fas fa-quote-left text-[#2563EB]"></i> Quick Facts</h3>
+                <ul className="mt-4 space-y-3 text-[#1E293B]">
+                  <li className="flex items-center gap-2"><i className="fas fa-map-marker-alt text-[#2563EB] w-5"></i> Bangalore, India</li>
+                  <li className="flex items-center gap-2"><i className="fas fa-laptop-code w-5"></i> 1+ year internship experience</li>
+                  <li className="flex items-center gap-2"><i className="fas fa-cloud-arrow-up w-5"></i> Azure & cloud enthusiastic</li>
+                  <li className="flex items-center gap-2"><i className="fas fa-code-branch w-5"></i> Open to SDE roles</li>
+                </ul>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+      );
+
+      const SkillsSection = () => (
+        <section id="skills" className="py-20 bg-[#F8FAFC] scroll-mt-16">
+          <div className="max-w-7xl mx-auto px-6 md:px-10">
+            <motion.div whileInView={{ y: 0, opacity: 1 }} initial={{ y: 30, opacity: 0 }} viewport={{ once: true }}>
+              <h2 className="text-3xl font-bold text-[#0F172A] border-b-4 border-[#2563EB] pb-2 inline-block">Technical Skills</h2>
+            </motion.div>
+            <div className="grid md:grid-cols-3 gap-8 mt-12">
+              {Object.entries(skills).map(([category, items], idx) => (
+                <motion.div key={category} whileInView={{ opacity: 1, y: 0 }} initial={{ opacity: 0, y: 20 }} transition={{ delay: idx * 0.1 }} viewport={{ once: true }} className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02]">
+                  <h3 className="text-xl font-bold capitalize text-[#2563EB] mb-4"><i className={`fas ${category === 'languages' ? 'fa-terminal' : category === 'web' ? 'fa-globe' : 'fa-cloud'} mr-2`}></i>{category}</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {items.map(skill => (<span key={skill} className="px-3 py-1.5 bg-[#EFF6FF] text-[#1E4BC2] rounded-full text-sm font-semibold">{skill}</span>))}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+
+      const Experience = () => (
+        <section id="experience" className="py-20 bg-white scroll-mt-16">
+          <div className="max-w-7xl mx-auto px-6 md:px-10">
+            <motion.div whileInView={{ y: 0, opacity: 1 }} initial={{ y: 30 }} viewport={{ once: true }}><h2 className="text-3xl font-bold text-[#0F172A] border-b-4 border-[#2563EB] pb-2 inline-block">Experience</h2></motion.div>
+            <div className="mt-12 space-y-10">
+              {experienceList.map((exp, idx) => (
+                <motion.div key={idx} whileInView={{ opacity: 1, x: 0 }} initial={{ opacity: 0, x: -20 }} transition={{ delay: idx * 0.07 }} viewport={{ once: true }} className="border-l-4 border-[#2563EB] pl-6 relative">
+                  <div className="absolute -left-3 top-1.5 w-5 h-5 bg-[#2563EB] rounded-full ring-4 ring-white"></div>
+                  <h3 className="text-xl font-bold text-[#0F172A]">{exp.role}</h3>
+                  <p className="text-[#2563EB] font-semibold">{exp.company} <span className="text-sm text-gray-500 ml-2 font-normal">{exp.period}</span></p>
+                  <ul className="list-disc list-inside mt-2 text-[#1E293B]/80 space-y-1">
+                    {exp.duties.map((duty, i) => <li key={i}>{duty}</li>)}
+                  </ul>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+
+      const CertificationsSection = () => (
+        <section id="certifications" className="py-20 bg-[#F8FAFC] scroll-mt-16">
+          <div className="max-w-7xl mx-auto px-6 md:px-10">
+            <motion.div whileInView={{ y: 0, opacity: 1 }} initial={{ y: 30 }} viewport={{ once: true }}><h2 className="text-3xl font-bold text-[#0F172A] border-b-4 border-[#2563EB] pb-2 inline-block">Certifications</h2></motion.div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+              {certifications.map((cert, idx) => (
+                <motion.div key={idx} whileInView={{ scale: 1, opacity: 1 }} initial={{ scale: 0.95, opacity: 0 }} viewport={{ once: true }} transition={{ delay: idx * 0.05 }} className="bg-white rounded-xl p-5 shadow-sm flex items-start gap-4 border border-gray-100 hover:shadow-md transition-all hover:border-blue-200">
+                  <i className={`${cert.icon} text-3xl text-[#2563EB]`}></i>
+                  <div><h3 className="font-bold text-[#0F172A]">{cert.name}</h3><p className="text-sm text-gray-500">{cert.issuer}</p></div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+
+      const Projects = ({ highlightedIndex }) => (
+        <section id="projects" className="py-20 bg-white scroll-mt-16">
+          <div className="max-w-7xl mx-auto px-6 md:px-10">
+            <motion.div whileInView={{ y: 0, opacity: 1 }} initial={{ y: 30 }} viewport={{ once: true }}><h2 className="text-3xl font-bold text-[#0F172A] border-b-4 border-[#2563EB] pb-2 inline-block">Projects</h2></motion.div>
+            <div className="grid md:grid-cols-2 gap-8 mt-12">
+              {projectsData.map((project, idx) => (
+                <motion.div key={idx} whileHover={{ y: -6 }} whileInView={{ opacity: 1, y: 0 }} initial={{ opacity: 0, y: 40 }} viewport={{ once: true }} transition={{ delay: idx * 0.1 }} className={`rounded-2xl overflow-hidden transition-all duration-300 group ${highlightedIndex === idx ? 'border-4 border-[#2563EB] shadow-[0_20px_60px_rgba(37,99,235,0.18)]' : 'bg-[#F1F5F9] shadow-md hover:shadow-xl'}`}>
+                  <div className="p-6 bg-white h-full">
+                    <div className="flex items-center gap-3"><i className={`fas ${project.icon} text-3xl text-[#2563EB] group-hover:scale-110 transition`}></i><h3 className="text-2xl font-bold text-[#0F172A]">{project.title}</h3></div>
+                    <p className="text-[#1E293B]/80 mt-3">{project.desc}</p>
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      {project.tags.map(tag => <span key={tag} className="bg-white/80 text-[#2563EB] text-xs font-semibold px-3 py-1 rounded-full shadow-sm">{tag}</span>)}
+                    </div>
+                    {highlightedIndex === idx && <div className="mt-4 rounded-2xl bg-[#EFF6FF] border border-[#DBEAFE] p-3 text-[#1E3A8A] font-semibold">Selected project from the interactive action panel.</div>}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+
+      // Resume section with proper download (text + JSON resume styling)
+      const ResumeSection = () => {
+        const [copied, setCopied] = React.useState(false);
+        const resumeText = `Dileep Kumar - BCA Cloud Technology Portfolio\n===========================================\nEducation: BCA (Cloud Technology) | Nitte Institute of Professional Education\nSkills: Python, Java, JavaScript, React, Tailwind CSS, Microsoft Azure, HTML5/CSS3, Flask.\nExperience:\n- Full Stack Intern @ Zephyr Technologies: Develop full-stack features, collaborate in agile sprints, implement responsive UI.\n- Python Intern @ System Tron: Scripting, debugging, problem-solving modules.\n- Cloud Technology Intern @ Intellipaat: Azure services, virtual machines, static web apps.\n- Front-End Intern: HTML/CSS modern layouts & accessibility.\nCertifications: Python, Azure Cloud, Front-End Dev, Design Thinking, Employability Skills.\nProjects: Cloud Task Manager, Portfolio 3.0, E-commerce Dashboard, WeatherWise App.\nContact: dileep.kumar@example.com | LinkedIn: linkedin.com/in/dileep-kumar\n-------------------------------------------\nThis resume was generated from Dileep's official portfolio.`;
+        const handleDownload = () => {
+          const blob = new Blob([resumeText], { type: 'text/plain' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = 'Dileep_Kumar_Resume.txt';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        };
+        const handleCopy = async () => {
+          try {
+            await navigator.clipboard.writeText(resumeText);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2200);
+          } catch (err) {
+            window.prompt('Copy the resume text manually:', resumeText);
+          }
+        };
+        return (
+          <section id="resume" className="py-20 bg-gradient-to-r from-[#F8FAFC] to-[#EEF2FF] scroll-mt-16">
+            <div className="max-w-4xl mx-auto px-6 text-center">
+              <motion.div whileInView={{ opacity: 1, y: 0 }} initial={{ opacity: 0, y: 20 }} viewport={{ once: true }}>
+                <div className="bg-white w-20 h-20 rounded-full flex items-center justify-center mx-auto shadow-md"><i className="fas fa-file-alt text-4xl text-[#2563EB]"></i></div>
+                <h2 className="text-3xl font-bold text-[#0F172A] mt-4">My Resume</h2>
+                <p className="text-[#1E293B]/70 mt-2 mb-6 max-w-md mx-auto">Download my resume or copy the summary to your clipboard instantly.</p>
+                <div className="grid gap-4 sm:grid-cols-2 mt-6">
+                  <button onClick={handleDownload} className="inline-flex items-center gap-3 justify-center bg-[#2563EB] hover:bg-[#1e4bc2] text-white px-6 py-4 rounded-xl font-bold text-lg shadow-lg transition-all hover:scale-105"><i className="fas fa-download"></i> Download Resume</button>
+                  <button onClick={handleCopy} className="inline-flex items-center gap-3 justify-center border border-[#2563EB] text-[#2563EB] px-6 py-4 rounded-xl font-bold text-lg hover:bg-[#2563EB]/10 transition-all hover:scale-105"><i className="fas fa-copy"></i> Copy Resume Summary</button>
+                </div>
+                {copied && <div className="mt-4 inline-block bg-green-100 text-green-700 px-4 py-3 rounded-xl font-semibold">Copied to clipboard!</div>}
+              </motion.div>
+            </div>
+          </section>
+        );
+      };
+
+      const Contact = () => {
+        const [formData, setFormData] = React.useState({ name: '', email: '', message: '' });
+        const [submitted, setSubmitted] = React.useState(false);
+        const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+        const handleSubmit = (e) => {
+          e.preventDefault();
+          console.log('Contact form submitted:', formData);
+          setSubmitted(true);
+          setTimeout(() => setSubmitted(false), 3500);
+          setFormData({ name: '', email: '', message: '' });
+        };
+        return (
+          <section id="contact" className="py-20 bg-white scroll-mt-16">
+            <div className="max-w-5xl mx-auto px-6 md:px-10">
+              <motion.div whileInView={{ opacity: 1 }} initial={{ opacity: 0 }} viewport={{ once: true }} className="text-center"><h2 className="text-3xl font-bold text-[#0F172A] border-b-4 border-[#2563EB] pb-2 inline-block">Get In Touch</h2></motion.div>
+              <div className="grid md:grid-cols-2 gap-12 mt-12">
+                <motion.div initial={{ x: -20, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} viewport={{ once: true }}>
+                  <p className="text-[#1E293B] leading-relaxed">I’m actively looking for new projects and exciting collaborations. Let's create something meaningful together — reach out by email or through LinkedIn.</p>
+                  <div className="mt-8 space-y-5">
+                    <div className="flex items-center gap-4"><i className="fas fa-envelope w-6 text-[#2563EB] text-xl"></i><span className="break-all">dk8404714@gmail.com</span></div>
+                    <div className="flex items-center gap-4"><i className="fab fa-linkedin w-6 text-[#2563EB] text-xl"></i><a href="https://www.linkedin.com/in/dileep-kumar-ha/" target="_blank" rel="noopener noreferrer" className="hover:underline text-[#2563EB]">linkedin.com/in/dileep-kumar-ha</a></div>
+                    <div className="flex items-center gap-4"><i className="fab fa-github w-6 text-[#2563EB] text-xl"></i><a href="#" className="hover:underline">github.com/dileepkumar</a></div>
+                  </div>
+                </motion.div>
+                <motion.form onSubmit={handleSubmit} initial={{ x: 20, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} viewport={{ once: true }} className="bg-[#F8FAFC] p-6 rounded-2xl shadow-md">
+                  {submitted && <div className="mb-4 bg-green-100 text-green-700 p-3 rounded-xl text-center font-medium">✓ Message sent! I'll reply soon.</div>}
+                  <div className="mb-4"><input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Full Name" required className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2563EB]" /></div>
+                  <div className="mb-4"><input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email Address" required className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2563EB]" /></div>
+                  <div className="mb-5"><textarea name="message" rows="4" value={formData.message} onChange={handleChange} placeholder="Your message..." required className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#2563EB]"></textarea></div>
+                  <button type="submit" className="w-full bg-[#2563EB] hover:bg-[#1e4bc2] text-white font-semibold py-3 rounded-xl transition flex gap-2 justify-center items-center"><i className="fas fa-paper-plane"></i> Send Message</button>
+                </motion.form>
+              </div>
+            </div>
+          </section>
+        );
+      };
+
+      const Footer = () => (
+        <footer className="bg-[#0F172A] text-white py-8 text-center">
+          <p>© Dileep Kumar — Cloud & Full Stack Portfolio. All rights reserved.</p>
+          <div className="flex justify-center gap-6 mt-3">
+            <a href="#" className="hover:text-[#38BDF8] transition"><i className="fab fa-linkedin text-xl"></i></a>
+            <a href="#" className="hover:text-[#38BDF8] transition"><i className="fab fa-github text-xl"></i></a>
+          </div>
+        </footer>
+      );
+
+      // Main App Component
+      const App = () => {
+        const [funFactText, setFunFactText] = React.useState('Click a button to discover something cool.');
+        const [selectedProjectIndex, setSelectedProjectIndex] = React.useState(null);
+        const [isDarkMode, setIsDarkMode] = React.useState(false);
+        const [isProfileVisible, setIsProfileVisible] = React.useState(false);
+
+        React.useEffect(() => {
+          const handleAnchorClick = (e) => {
+            let target = e.target.closest('a');
+            if (target && target.hash && target.hash.startsWith('#') && target.hash !== '#') {
+              const id = target.hash.substring(1);
+              const element = document.getElementById(id);
+              if (element) {
+                e.preventDefault();
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }
+          };
+          document.addEventListener('click', handleAnchorClick);
+          return () => document.removeEventListener('click', handleAnchorClick);
+        }, []);
+
+        const handleRevealFact = () => {
+          const next = funFacts[Math.floor(Math.random() * funFacts.length)];
+          setFunFactText(next);
+        };
+
+        const handlePickProject = () => {
+          const nextIndex = Math.floor(Math.random() * projectsData.length);
+          setSelectedProjectIndex(nextIndex);
+          setFunFactText(`You selected: ${projectsData[nextIndex].title}`);
+          document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+
+        const toggleTheme = () => {
+          setIsDarkMode((prev) => !prev);
+        };
+
+        const toggleProfileVisibility = () => {
+          setIsProfileVisible((prev) => !prev);
+        };
+
+        return (
+          <div className={`overflow-x-hidden ${isDarkMode ? 'bg-slate-950 text-slate-100' : ''}`}>
+            <NavBar isDarkMode={isDarkMode} onToggleTheme={toggleTheme} />
+            <Hero
+              funFact={funFactText}
+              onRevealFact={handleRevealFact}
+              onPickProject={handlePickProject}
+              isProfileVisible={isProfileVisible}
+              onToggleProfile={toggleProfileVisibility}
+            />
+            <About />
+            <SkillsSection />
+            <Experience />
+            <CertificationsSection />
+            <Projects highlightedIndex={selectedProjectIndex} />
+            <ResumeSection />
+            <Contact />
+            <Footer />
+          </div>
+        );
+      };
+      
+      // Render to DOM
+      const rootElement = document.getElementById('root');
+      if (ReactDOM.createRoot) {
+        const root = ReactDOM.createRoot(rootElement);
+        root.render(<App />);
+      } else {
+        ReactDOM.render(<App />, rootElement);
+      }
+    </script>
+  </body>
+</html>
